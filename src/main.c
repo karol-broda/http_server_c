@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 char base_directory[1024] = {0};
 int port = 4221;
 
 int main(int argc, char **argv)
 {
+
     for (int i = 1; i < argc; i++)
     {
         if ((strcmp(argv[i], "--directory") == 0 || strcmp(argv[i], "-d") == 0) && i + 1 < argc)

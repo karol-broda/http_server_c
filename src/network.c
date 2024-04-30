@@ -10,9 +10,20 @@
 #include <stdbool.h>
 #include "main.h"
 
+int server_fd;
+
+void signal_handler(int signal_number)
+{
+    printf("\nReceived signal to stop, shutting down...\n");
+    close(server_fd);
+    exit(0);
+}
+
 void run_server()
 {
-    int server_fd;
+    signal(SIGINT, signal_handler);
+    signal(SIGTERM, signal_handler);
+
     struct sockaddr_in serv_addr = {
         .sin_family = AF_INET,
         .sin_port = htons(port),
