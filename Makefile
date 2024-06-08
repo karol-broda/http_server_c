@@ -21,8 +21,8 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 run: $(TARGET)
-	@echo "Running http_server on port 4221 with base directory /var/www"
-	./$(TARGET) -p 4221 -d /var/www
+	@echo "Running http_server on port 4221 with base directory /Users/karolbroda/Personal/http_server_c/tests/data"
+	./$(TARGET) -p 4221 -d /Users/karolbroda/Personal/http_server_c/tests/data
 
 test: $(TESTDIR)/run_tests.sh 
 	@mkdir -p $(BINDIR)
