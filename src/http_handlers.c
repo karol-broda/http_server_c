@@ -8,6 +8,8 @@
 #include <errno.h>
 #include "file_ops.h"
 #include <sys/socket.h>
+#include "ui.h"
+#include <ncurses.h>
 
 void *handle_connection(void *client_socket)
 {
@@ -18,7 +20,7 @@ void *handle_connection(void *client_socket)
     int request_size = recv(client_fd, client_request, sizeof(client_request), 0);
     if (request_size < 0)
     {
-        printf("err: reading from socket: %s\n", strerror(errno));
+        display_error("err: reading from socket: %s\n", strerror(errno));
         close(client_fd);
         return NULL;
     }
@@ -26,10 +28,20 @@ void *handle_connection(void *client_socket)
     char path[1024];
     if (!parse_path_req(client_request, path, sizeof(path)))
     {
-        printf("err: path parsing\n");
+        display_error("err: path parsing\n");
+        close(client_fd);
         return NULL;
     }
-    printf("request: %s\n", client_request);
+
+        if (use_ncurses)
+    {
+        printw("request: %s\n", client_request);
+    }
+    else
+    {
+        printf("request: %s\n", client_request);
+    }
+
     if (check_path(client_request, "/"))
     {
         char response200[] = "HTTP/1.1 200 OK\r\n\r\nfinally";
@@ -56,7 +68,7 @@ void *handle_connection(void *client_socket)
         FILE *file = fopen("./tests/data/index.html", "rb");
         if (!file)
         {
-            perror("File opening failed");
+            display_error("File opening failed: %s\n", strerror(errno));
             char response500[] = "HTTP/1.1 500 Internal Server Error\r\n\r\n500 - Internal Server Error";
             send(client_fd, response500, strlen(response500), 0);
         }
@@ -82,7 +94,7 @@ void *handle_connection(void *client_socket)
         FILE *file = fopen("./tests/data/der_lord.txt", "rb");
         if (!file)
         {
-            perror("File opening failed");
+            display_error("File opening failed: %s\n", strerror(errno));
             char response500[] = "HTTP/1.1 500 Internal Server Error\r\n\r\n500 - Internal Server Error";
             send(client_fd, response500, strlen(response500), 0);
         }
@@ -143,9 +155,14 @@ void *handle_connection(void *client_socket)
     }
     else if (check_path(client_request, "/files/*"))
     {
+
         char last_segment[1024];
         get_last_path_part(path, last_segment, sizeof(last_segment));
         handle_file_request(client_fd, last_segment);
+    }
+    else if (check_path(client_request, "/stream-poem"))
+    {
+        stream_file(client_fd, "./tests/data/poem.txt");
     }
     else
     {

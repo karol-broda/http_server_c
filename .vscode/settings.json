@@ -3,6 +3,17 @@
     "utils.h": "c",
     "unistd.h": "c",
     "stdbool.h": "c",
-    "socket.h": "c"
+    "socket.h": "c",
+    "file_ops.h": "c",
+    "stdlib.h": "c",
+    "stdio.h": "c",
+    "main.h": "c",
+    "network.h": "c",
+    "pthread.h": "c",
+    "in.h": "c",
+    "signal.h": "c",
+    "errno.h": "c",
+    "ncurses.h": "c",
+    "ui.h": "c"
   }
 }

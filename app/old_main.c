@@ -75,7 +75,7 @@ void get_last_path_part(const char *path, char *segment, size_t segment_size)
 void handle_file_request(int client_fd, const char *path)
 {
 	char full_path[2048];
-	snprintf(full_path, sizeof(full_path), "%s%s", base_directory, path);
+	snprintw(full_path, sizeof(full_path), "%s%s", base_directory, path);
 
 	FILE *file = fopen(full_path, "rb");
 	if (file == NULL)
@@ -93,7 +93,7 @@ void handle_file_request(int client_fd, const char *path)
 	fread(buffer, 1, file_size, file);
 
 	char header[1024];
-	snprintf(header, sizeof(header), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %ld\r\n\r\n", file_size);
+	snprintw(header, sizeof(header), "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %ld\r\n\r\n", file_size);
 	send(client_fd, header, strlen(header), 0);
 	send(client_fd, buffer, file_size, 0);
 
@@ -104,7 +104,7 @@ void handle_file_request(int client_fd, const char *path)
 void save_file_from_post(int client_fd, const char *path, const char *data)
 {
 	char full_path[2048];
-	snprintf(full_path, sizeof(full_path), "%s/%s", base_directory, path);
+	snprintw(full_path, sizeof(full_path), "%s/%s", base_directory, path);
 
 	FILE *file = fopen(full_path, "wb");
 	if (file == NULL)
@@ -140,14 +140,14 @@ void *handle_connection(void *client_socket)
 	int request_size = recv(client_fd, client_request, sizeof(client_request), 0);
 	if (request_size < 0)
 	{
-		printf("Error reading from socket: %s\n", strerror(errno));
+		printw("Error reading from socket: %s\n", strerror(errno));
 		close(client_fd);
 		return NULL;
 	}
 
 	char path[1024];
 	parse_path_req(client_request, path, sizeof(path));
-	printf("request: %s\n", client_request);
+	printw("request: %s\n", client_request);
 
 	if (check_path(client_request, "/"))
 	{
@@ -159,8 +159,8 @@ void *handle_connection(void *client_socket)
 		char last_segment[1024];
 		get_last_path_part(path, last_segment, sizeof(last_segment));
 		char response[2048];
-		snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %zu\r\n\r\n%s", strlen(last_segment), last_segment);
-		printf("/echo: %s", response);
+		snprintw(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %zu\r\n\r\n%s", strlen(last_segment), last_segment);
+		printw("/echo: %s", response);
 		send(client_fd, response, strlen(response), 0);
 	}
 	else if (check_path(client_request, "/user-agent"))
@@ -183,8 +183,8 @@ void *handle_connection(void *client_socket)
 		}
 
 		char response[2048];
-		snprintf(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %zu\r\n\r\n%s", strlen(userAgent), userAgent);
-		printf("/user-agent: %s\n", response);
+		snprintw(response, sizeof(response), "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %zu\r\n\r\n%s", strlen(userAgent), userAgent);
+		printw("/user-agent: %s\n", response);
 		send(client_fd, response, strlen(response), 0);
 	}
 	else if (strncmp(client_request, "POST ", 5) == 0 && starts_with("/files/", path))
@@ -212,7 +212,7 @@ void *handle_connection(void *client_socket)
 	else
 	{
 		char response404[] = "HTTP/1.1 404 Not Found\r\n\r\n404 - Not Found";
-		printf("404: %s\n", response404);
+		printw("404: %s\n", response404);
 		send(client_fd, response404, strlen(response404), 0);
 	}
 
@@ -256,9 +256,9 @@ int main(int argc, char **argv)
 		perror("listen failed");
 		return 1;
 	}
-
-	printf("server running...\n");
-
+	attron(A_BOLD);
+	printw("server running...\n");
+	attroff(A_BOLD);
 	while (true)
 	{
 		struct sockaddr_in client_addr;

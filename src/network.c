@@ -8,19 +8,24 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <ncurses.h>
 #include "main.h"
+#include "ui.h"
 
 int server_fd;
 
 void signal_handler(int signal_number)
 {
-    printf("\nReceived signal to stop, shutting down...\n");
+    printw("\nReceived signal to stop, shutting down...\n");
     close(server_fd);
     exit(0);
 }
 
 void run_server()
 {
+    pthread_mutex_init(&ncurses_mutex, NULL);
+    init_ncurses();
+
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
@@ -55,8 +60,6 @@ void run_server()
         return;
     }
 
-    printf("server is running on port: \"%d\"...\n", port);
-
     while (true)
     {
         struct sockaddr_in client_addr;
@@ -73,7 +76,7 @@ void run_server()
         pthread_t thread_id;
         if (pthread_create(&thread_id, NULL, handle_connection, client_fd) != 0)
         {
-            perror("creating thred");
+            perror("creating thraed");
             close(*client_fd);
             free(client_fd);
             continue;

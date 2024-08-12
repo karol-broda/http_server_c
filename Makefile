@@ -1,10 +1,12 @@
 CC=gcc
 CFLAGS=-I./include
-LDFLAGS=-pthread
+LDFLAGS=-pthread -lncurses
+
 SRCDIR=src
 OBJDIR=obj
 BINDIR=bin
 TESTDIR=tests
+
 SOURCES=$(wildcard $(SRCDIR)/*.c)
 OBJECTS=$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 TARGET=$(BINDIR)/http_server
@@ -22,7 +24,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 
 run: $(TARGET)
 	@echo "Running http_server on port 4221 with base directory /Users/karolbroda/Personal/http_server_c/tests/data"
-	./$(TARGET) -p 4221 -d /Users/karolbroda/Personal/http_server_c/tests/data
+	./$(TARGET) -p 4221 -d ./tests/data
 
 test: $(TESTDIR)/run_tests.sh 
 	@mkdir -p $(BINDIR)
@@ -37,6 +39,5 @@ clean:
 stop:
 	@echo "Stopping http_server..."
 	@pkill -f $(TARGET) || echo "http_server is not running"
-
 
 .PHONY: all test check clean run stop

@@ -24,17 +24,17 @@ total_tests=0
 passed_tests=0
 
 echo -e "${BLUE}Running test cases...${NC}"
+if ./tests/test_cases/test_post_requests.sh; then
+    ((passed_tests+=1))
+fi
+((total_tests+=1))
+
 if ./tests/test_cases/test_file_retrieval.sh; then
     ((passed_tests+=1))
 fi
 ((total_tests+=1))
 
 if ./tests/test_cases/test_404_responses.sh; then
-    ((passed_tests+=1))
-fi
-((total_tests+=1))
-
-if ./tests/test_cases/test_post_requests.sh; then
     ((passed_tests+=1))
 fi
 ((total_tests+=1))
