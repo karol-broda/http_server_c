@@ -16,22 +16,6 @@ pthread_mutex_t ncurses_mutex;
 pthread_t key_listener_thread;
 volatile int running = 1;
 
-void *key_listener(void *arg)
-{
-    while (running)
-    {
-        if (use_ncurses)
-        {
-            int ch = getch();
-            if (ch == 'q' || ch == 'Q')
-            {
-                running = 0;
-            }
-        }
-    }
-    return NULL;
-}
-
 int main(int argc, char **argv)
 {
     struct sigaction sa;

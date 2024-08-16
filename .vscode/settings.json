@@ -14,6 +14,8 @@
     "signal.h": "c",
     "errno.h": "c",
     "ncurses.h": "c",
-    "ui.h": "c"
+    "ui.h": "c",
+    "stat.h": "c",
+    "string.h": "c"
   }
 }

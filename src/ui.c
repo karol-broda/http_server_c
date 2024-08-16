@@ -12,6 +12,21 @@ int max_y, max_x;
 
 extern int use_ncurses;
 
+void *key_listener(void *arg)
+{
+    while (running)
+    {
+        if (use_ncurses)
+        {
+            int ch = getch();
+            if (ch == 'q' || ch == 'Q')
+            {
+                running = 0;
+            }
+        }
+    }
+    return NULL;
+}
 void init_ncurses()
 {
     if (!use_ncurses)

@@ -1,0 +1,135 @@
+-----------------------------4307040163758518867962684329
+Content-Disposition: form-data; name="file"; filename="openapi3_0.json"
+Content-Type: application/json
+
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HTTP Server C",
+    "version": "0.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4221",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root endpoint",
+        "description": "Returns a basic 200 OK response.",
+        "responses": {
+          "200": {
+            "description": "A successful response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "finally"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/echo/{message}": {
+      "get": {
+        "summary": "Echo a message",
+        "description": "Returns the last segment of the requested path.",
+        "parameters": [
+          {
+            "name": "message",
+            "in": "path",
+            "required": true,
+            "description": "The message to echo.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The echoed message",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Your message here"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user-agent": {
+      "get": {
+        "summary": "Get user agent",
+        "description": "Returns the User-Agent header of the request.",
+        "responses": {
+          "200": {
+            "description": "The user agent",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/files/{filename}": {
+      "post": {
+        "summary": "Upload a file",
+        "description": "Uploads a file with the given filename.",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "description": "Name of the file to upload.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "File uploaded successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "descrip“

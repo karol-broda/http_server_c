@@ -33,7 +33,7 @@ void *handle_connection(void *client_socket)
         return NULL;
     }
 
-        if (use_ncurses)
+    if (use_ncurses)
     {
         printw("request: %s\n", client_request);
     }
@@ -163,6 +163,16 @@ void *handle_connection(void *client_socket)
     else if (check_path(client_request, "/stream-poem"))
     {
         stream_file(client_fd, "./tests/data/poem.txt");
+    }
+    else if (check_path(client_request, "/openapi.json"))
+    {
+        handle_openapi_request(client_fd);
+    }
+    else if (check_path(client_request, "/docs/*"))
+    {
+        char resource_path[1024];
+        snprintf(resource_path, sizeof(resource_path), "/swagger/dist%s", path + 5);
+        handle_static_file_request(client_fd, resource_path);
     }
     else
     {

@@ -7,6 +7,98 @@
 #include <sys/socket.h>
 #include <stdio.h>
 #include <ncurses.h>
+#include <sys/stat.h>
+
+void handle_static_file_request(int client_fd, const char *path)
+{
+    char file_path[1024] = "./public";
+    strncat(file_path, path, sizeof(file_path) - strlen(file_path) - 1);
+
+    struct stat path_stat;
+    if (stat(file_path, &path_stat) < 0 || S_ISDIR(path_stat.st_mode))
+    {
+        strncat(file_path, "/index.html", sizeof(file_path) - strlen(file_path) - 1);
+    }
+
+    FILE *file = fopen(file_path, "rb");
+    if (!file)
+    {
+        char response404[] = "HTTP/1.1 404 Not Found\r\n\r\n404 - Not Found";
+        send(client_fd, response404, strlen(response404), 0);
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    rewind(file);
+
+    char *file_contents = (char *)malloc(file_size + 1);
+    fread(file_contents, file_size, 1, file);
+    file_contents[file_size] = '\0';
+
+    const char *ext = strrchr(file_path, '.');
+    const char *content_type = "text/plain";
+    if (ext)
+    {
+        if (strcmp(ext, ".html") == 0)
+        {
+            content_type = "text/html";
+        }
+        else if (strcmp(ext, ".css") == 0)
+        {
+            content_type = "text/css";
+        }
+        else if (strcmp(ext, ".js") == 0)
+        {
+            content_type = "application/javascript";
+        }
+        else if (strcmp(ext, ".png") == 0)
+        {
+            content_type = "image/png";
+        }
+        else if (strcmp(ext, ".jpg") == 0)
+        {
+            content_type = "image/jpeg";
+        }
+    }
+
+    char response_header[512];
+    snprintf(response_header, sizeof(response_header),
+             "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %ld\r\n\r\n",
+             content_type, file_size);
+    send(client_fd, response_header, strlen(response_header), 0);
+    send(client_fd, file_contents, file_size, 0);
+
+    free(file_contents);
+    fclose(file);
+}
+
+void handle_openapi_request(int client_fd)
+{
+    FILE *file = fopen("./public/swagger/openapi.json", "rb");
+    if (!file)
+    {
+        perror("Failed to open openapi.json");
+        char response500[] = "HTTP/1.1 500 Internal Server Error\r\n\r\n500 - Internal Server Error";
+        send(client_fd, response500, strlen(response500), 0);
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    rewind(file);
+    char *file_contents = (char *)malloc(file_size + 1);
+    fread(file_contents, file_size, 1, file);
+    file_contents[file_size] = '\0';
+
+    char response_header[512];
+    snprintf(response_header, sizeof(response_header), "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: %ld\r\n\r\n", file_size);
+    send(client_fd, response_header, strlen(response_header), 0);
+    send(client_fd, file_contents, file_size, 0);
+
+    free(file_contents);
+    fclose(file);
+}
 
 void handle_file_request(int client_fd, const char *path)
 {

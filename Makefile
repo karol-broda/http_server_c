@@ -1,10 +1,15 @@
 CC=gcc
-CFLAGS=-I./include
+
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+INCLUDES=$(foreach d,$(call rwildcard,./include,/),-I$d)
+
+CFLAGS=$(INCLUDES)
+
 LDFLAGS=-pthread -lncurses
 
 SRCDIR=src
-OBJDIR=obj
-BINDIR=bin
+OBJDIR=build/obj
+BINDIR=build/bin
 TESTDIR=tests
 
 SOURCES=$(wildcard $(SRCDIR)/*.c)
@@ -23,8 +28,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) -c $(CFLAGS) $< -o $@
 
 run: $(TARGET)
-	@echo "Running http_server on port 4221 with base directory /Users/karolbroda/Personal/http_server_c/tests/data"
-	./$(TARGET) -p 4221 -d ./tests/data
+	./$(TARGET) -p 4221 -d ./tests/data --no-ui
 
 test: $(TESTDIR)/run_tests.sh 
 	@mkdir -p $(BINDIR)
