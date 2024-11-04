@@ -9,13 +9,13 @@ echo -e "${BLUE}Starting Full Test Suite for HTTP Server${NC}"
 
 cd "$(dirname "$0")/.."
 
-if [ ! -f "./bin/http_server" ]; then
+if [ ! -f "./build/bin/http_server" ]; then
     echo -e "${RED}Build failed, stopping tests.${NC}"
     exit 1
 fi
 
 echo -e "${BLUE}Starting the server...${NC}"
-./bin/http_server -d ./tests/data -p 4221 &
+./build/bin/http_server -d ./tests/data -p 4221 &
 SERVER_PID=$!
 
 sleep 2
